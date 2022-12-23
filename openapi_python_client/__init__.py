@@ -14,7 +14,6 @@ import httpcore
 import httpx
 import yaml
 from jinja2 import BaseLoader, ChoiceLoader, Environment, FileSystemLoader, PackageLoader
-
 from openapi_python_client import utils
 
 from .config import Config
@@ -317,8 +316,6 @@ class Project:  # pylint: disable=too-many-instance-attributes
 
         endpoint_collections_by_tag = self.openapi.endpoint_collections_by_tag
         for tag, collection in endpoint_collections_by_tag.items():
-            for endpoint in collection.endpoints:
-                print("build", endpoint.name)
             wrapper_path.write_text(
                 wrapper_template.render(imports=imports, endpoints=collection.endpoints), encoding=self.file_encoding
             )
