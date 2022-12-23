@@ -123,6 +123,7 @@ class Project:  # pylint: disable=too-many-instance-attributes
         self._create_package()
         self._build_metadata()
         self._build_models()
+        self._build_wrapper()
         self._build_api()
         self._run_post_hooks()
         return self._get_errors()
@@ -255,7 +256,6 @@ class Project:  # pylint: disable=too-many-instance-attributes
                 module_path.write_text(str_enum_template.render(enum=enum), encoding=self.file_encoding)
             imports.append(import_string_from_class(enum.class_info))
             alls.append(enum.class_info.name)
-
         models_init_template = self.env.get_template("models_init.py.jinja")
         models_init.write_text(models_init_template.render(imports=imports, alls=alls), encoding=self.file_encoding)
 
@@ -301,6 +301,27 @@ class Project:  # pylint: disable=too-many-instance-attributes
                     ),
                     encoding=self.file_encoding,
                 )
+
+    # pylint: disable=too-many-locals
+    def _build_wrapper(self) -> None:
+        # Generate Client Wrapper
+        wrapper_path = self.package_dir / "sail_class.py"
+        wrapper_template = self.env.get_template("wrapper.py.jinja")
+
+        imports = []
+        for model in self.openapi.models:
+            imports.append(import_string_from_class(model.class_info, prefix="models"))
+
+        for enum in self.openapi.enums:
+            imports.append(import_string_from_class(enum.class_info, prefix="models"))
+
+        endpoint_collections_by_tag = self.openapi.endpoint_collections_by_tag
+        for tag, collection in endpoint_collections_by_tag.items():
+            for endpoint in collection.endpoints:
+                print("build", endpoint.name)
+            wrapper_path.write_text(
+                wrapper_template.render(imports=imports, endpoints=collection.endpoints), encoding=self.file_encoding
+            )
 
 
 def _get_project_for_url_or_path(  # pylint: disable=too-many-arguments

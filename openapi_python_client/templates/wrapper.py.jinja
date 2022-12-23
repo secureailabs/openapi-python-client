@@ -1,0 +1,31 @@
+from client import Client, AuthenticatedClient
+from typing import Union, Any
+from http import HTTPStatus
+from .types import UNSET, Unset
+
+{% for import in imports | sort %}
+{{ import }}
+{% endfor %}
+
+{% for endpoint in endpoints %}
+from api.default import {{ endpoint.name }}
+{% endfor %}
+
+{% from "endpoint_macros.py.jinja" import header_params, cookie_params, query_params, json_body, multipart_body,
+    arguments, arguments_passing, arguments_no_client, client, kwargs, parse_response, docstring %}
+
+class SyncApis:
+    def __init__(self, client: AuthenticatedClient) -> None:
+        self._client = client
+
+    {% for endpoint in endpoints %}
+    def {{ endpoint.name }}(self, {{ arguments_no_client(endpoint) | indent(4)}}) -> {{ endpoint.response_type() }}:
+        response = {{ endpoint.name }}.sync(
+            {{ arguments_passing(endpoint) | indent(8)}}
+        )
+        if response is None:
+            raise Exception("No response")
+
+        return response
+
+    {% endfor %}

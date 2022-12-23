@@ -167,3 +167,72 @@ Returns:
     Response[{{ return_string }}]
 """
 {% endmacro %}
+
+
+{% macro arguments_passing(endpoint) %}
+{# path parameters #}
+{% for parameter in endpoint.path_parameters.values() %}
+{{ parameter.python_name }} = {{ parameter.python_name }},
+{% endfor %}
+{# Proper client based on whether or not the endpoint requires authentication #}
+{% if endpoint.requires_security %}
+client = self._client,
+{% else %}
+client = self._client,
+{% endif %}
+{# Form data if any #}
+{% if endpoint.form_body %}
+form_data = form_data,
+{% endif %}
+{# Multipart data if any #}
+{% if endpoint.multipart_body %}
+multipart_data = multipart_data,
+{% endif %}
+{# JSON body if any #}
+{% if endpoint.json_body %}
+json_body = json_body,
+{% endif %}
+{# query parameters #}
+{% for parameter in endpoint.query_parameters.values() %}
+{{ parameter.python_name }} = {{ parameter.python_name }},
+{% endfor %}
+{% for parameter in endpoint.header_parameters.values() %}
+{{ parameter.python_name }} = {{ parameter.python_name }},
+{% endfor %}
+{# cookie parameters #}
+{% for parameter in endpoint.cookie_parameters.values() %}
+{{ parameter.python_name }} = {{ parameter.python_name }},
+{% endfor %}
+{% endmacro %}
+
+
+{# The all the kwargs passed into an endpoint (and variants thereof)) #}
+{% macro arguments_no_client(endpoint) %}
+{# path parameters #}
+{% for parameter in endpoint.path_parameters.values() %}
+{{ parameter.to_string() }},
+{% endfor %}
+{# Form data if any #}
+{% if endpoint.form_body %}
+form_data: {{ endpoint.form_body.get_type_string() }},
+{% endif %}
+{# Multipart data if any #}
+{% if endpoint.multipart_body %}
+multipart_data: {{ endpoint.multipart_body.get_type_string() }},
+{% endif %}
+{# JSON body if any #}
+{% if endpoint.json_body %}
+json_body: {{ endpoint.json_body.get_type_string() }},
+{% endif %}
+{# query parameters #}
+{% for parameter in endpoint.query_parameters.values() %}
+{{ parameter.to_string() }},
+{% endfor %}
+{% for parameter in endpoint.header_parameters.values() %}
+{{ parameter.to_string() }},
+{% endfor %}
+{# cookie parameters #}
+{% for parameter in endpoint.cookie_parameters.values() %}
+{{ parameter.to_string() }},
+{% endfor %}
+{% endmacro %}
