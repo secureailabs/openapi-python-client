@@ -512,6 +512,22 @@ class Endpoint:
 
         return result, schemas, parameters
 
+    def success_response_type(self) -> str:
+        """Get the Python type of success response from this endpoint"""
+        types = sorted({response.prop.get_type_string(quoted=False) for response in self.responses})
+        if len(types) == 0:
+            return "Any"
+        if len(types) == 1:
+            return self.responses[0].prop.get_type_string(quoted=False)
+
+        # If there is a 2xx response, use that
+        for response in self.responses:
+            if response.status_code >= 200 and response.status_code < 300:
+                return response.prop.get_type_string(quoted=False)
+
+        # Otherwise, use the Union of all responses
+        return f"Union[{', '.join(types)}]"
+
     def response_type(self) -> str:
         """Get the Python type of any response from this endpoint"""
         types = sorted({response.prop.get_type_string(quoted=False) for response in self.responses})

@@ -309,10 +309,10 @@ class Project:  # pylint: disable=too-many-instance-attributes
 
         imports = []
         for model in self.openapi.models:
-            imports.append(import_string_from_class(model.class_info, prefix="models"))
+            imports.append(import_string_from_class(model.class_info, prefix=".models"))
 
         for enum in self.openapi.enums:
-            imports.append(import_string_from_class(enum.class_info, prefix="models"))
+            imports.append(import_string_from_class(enum.class_info, prefix=".models"))
 
         endpoint_collections_by_tag = self.openapi.endpoint_collections_by_tag
         for tag, collection in endpoint_collections_by_tag.items():
