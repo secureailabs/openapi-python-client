@@ -21,6 +21,7 @@ class SyncAuthenticatedOperations:
     {% for endpoint in endpoints %}
     {% if endpoint.requires_security %}
     def {{ endpoint.name }}(self, {{ arguments_no_client(endpoint) | indent(4)}}) -> {{ endpoint.success_response_type() }}:
+        {{ docstring(endpoint, endpoint.success_response_type()) | indent(4) }}
         response = {{ endpoint.name }}.sync(
             {{ arguments_passing(endpoint) | indent(8)}}
         )
@@ -42,6 +43,8 @@ class SyncOperations:
 
     {% else %}
     def {{ endpoint.name }}(self, {{ arguments_no_client(endpoint) | indent(4)}}) -> {{ endpoint.success_response_type() }}:
+        {{ docstring(endpoint, endpoint.success_response_type()) | indent(4) }}
+
         response = {{ endpoint.name }}.sync(
             {{ arguments_passing(endpoint) | indent(8)}}
         )
