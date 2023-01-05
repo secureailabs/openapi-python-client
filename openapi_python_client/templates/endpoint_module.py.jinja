@@ -108,7 +108,6 @@ def sync_detailed(
 
     return _build_response(client=client, response=response)
 
-{% if parsed_responses %}
 def sync(
     {{ arguments(endpoint) | indent(4) }}
 ) -> Optional[{{ return_string }}]:
@@ -117,7 +116,6 @@ def sync(
     return sync_detailed(
         {{ kwargs(endpoint) }}
     ).parsed
-{% endif %}
 
 async def asyncio_detailed(
     {{ arguments(endpoint) | indent(4) }}
@@ -135,7 +133,6 @@ async def asyncio_detailed(
 
     return _build_response(client=client, response=response)
 
-{% if parsed_responses %}
 async def asyncio(
     {{ arguments(endpoint) | indent(4) }}
 ) -> Optional[{{ return_string }}]:
@@ -144,5 +141,4 @@ async def asyncio(
     return (await asyncio_detailed(
         {{ kwargs(endpoint) }}
     )).parsed
-{% endif %}
 

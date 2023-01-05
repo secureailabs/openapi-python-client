@@ -22,14 +22,21 @@ class SyncAuthenticatedOperations:
     {% if endpoint.requires_security %}
     def {{ endpoint.name }}(self, {{ arguments_no_client(endpoint) | indent(4)}}) -> {{ endpoint.success_response_type() }}:
         {{ docstring(endpoint, endpoint.success_response_type()) | indent(4) }}
+        {% if endpoint.success_response_type() != "None" %}
         response = {{ endpoint.name }}.sync(
             {{ arguments_passing(endpoint) | indent(8)}}
         )
+
         if response is None:
             raise Exception("No response")
 
         assert isinstance(response, {{ endpoint.success_response_type() }})
         return response
+        {%else%}
+        {{ endpoint.name }}.sync(
+            {{ arguments_passing(endpoint) | indent(8)}}
+        )
+        {% endif %}
     {% endif %}
     {% endfor %}
 
@@ -44,14 +51,20 @@ class SyncOperations:
     {% else %}
     def {{ endpoint.name }}(self, {{ arguments_no_client(endpoint) | indent(4)}}) -> {{ endpoint.success_response_type() }}:
         {{ docstring(endpoint, endpoint.success_response_type()) | indent(4) }}
-
+        {% if endpoint.success_response_type() != "None" %}
         response = {{ endpoint.name }}.sync(
             {{ arguments_passing(endpoint) | indent(8)}}
         )
+
         if response is None:
             raise Exception("No response")
 
         assert isinstance(response, {{ endpoint.success_response_type() }})
         return response
+        {%else%}
+        {{ endpoint.name }}.sync(
+            {{ arguments_passing(endpoint) | indent(8)}}
+        )
+        {% endif %}
     {% endif %}
     {% endfor %}

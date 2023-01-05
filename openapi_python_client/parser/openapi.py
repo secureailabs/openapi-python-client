@@ -516,7 +516,7 @@ class Endpoint:
         """Get the Python type of success response from this endpoint"""
         types = sorted({response.prop.get_type_string(quoted=False) for response in self.responses})
         if len(types) == 0:
-            return "Any"
+            return "None"
         if len(types) == 1:
             return self.responses[0].prop.get_type_string(quoted=False)
 
@@ -532,7 +532,7 @@ class Endpoint:
         """Get the Python type of any response from this endpoint"""
         types = sorted({response.prop.get_type_string(quoted=False) for response in self.responses})
         if len(types) == 0:
-            return "Any"
+            return "None"
         if len(types) == 1:
             return self.responses[0].prop.get_type_string(quoted=False)
         return f"Union[{', '.join(types)}]"
